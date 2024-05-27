@@ -1,8 +1,13 @@
 import functions
 import FreeSimpleGUI as sg
 import time
+import os
 
-sg.theme("DarkGray3")
+if not os.path.exists("todos.txt"):
+    with open("todos.txt", 'w') as file:
+        pass
+
+sg.theme("Green")
 clock = sg.Text('', key='clock')
 text = sg.Text("Enter a To-Do")
 input_box = sg.InputText(tooltip="(Walk, Run, etc.)", key="todo")
@@ -11,9 +16,9 @@ list_box = sg.Listbox(values=functions.get_todos(), key='todos',
 add_button = sg.Button("Add")
 remove_button = sg.Button("Complete")
 edit_button = sg.Button("Edit")
+exit_button = sg.Button("Exit")
 
-
-window = sg.Window('To-Do List', layout=[[clock], [text], [input_box], [add_button, [list_box, edit_button], remove_button]],
+window = sg.Window('To-Do List', layout=[[clock], [text], [input_box], [add_button, [list_box, edit_button], remove_button], [exit_button]],
                    font=('Helvetica', 12))
 while True:
     event, values = window.read(timeout=200)
@@ -63,7 +68,8 @@ while True:
         case "todos":
             window['todo'].update(value=values['todos'][0])
 
-        case sg.WIN_CLOSED:
+        case "Exit":
+            sg.WIN_CLOSED
             break
 
 window.close()
