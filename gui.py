@@ -12,7 +12,7 @@ clock = sg.Text('', key='clock')
 text = sg.Text("Enter a To-Do")
 input_box = sg.InputText(tooltip="(Walk, Run, etc.)", key="todo")
 list_box = sg.Listbox(values=functions.get_todos(), key='todos',
-                      enable_events=True, size=[25, 10])
+                      enable_events=True, size=(25, 10))
 add_button = sg.Button("Add")
 remove_button = sg.Button("Complete")
 edit_button = sg.Button("Edit")
@@ -22,22 +22,31 @@ window = sg.Window('To-Do List', layout=[[clock], [text], [input_box], [add_butt
                    font=('Helvetica', 12))
 while True:
     event, values = window.read(timeout=200)
-    window["clock"].update(value=time.strftime("%b %d, %Y %H:%M:%S"))
-    print(1, event)
-    print(2, values)
-    print(3, values['todos'])
+
+    # print(1, event)
+    # print(2, values)
+    # print(3, values['todos'])
     match event:
+        case sg.WIN_CLOSED:
+            print("Window Closed.")
+            break
+
         case "Add":
+            print("Executing Add")
             try:
+                new_todos = values['todo']
+                print(f"Adding: {new_todos!r}")
                 todos = functions.get_todos()
-                new_todos = values['todo'] + "\n"
+                print(f"Loaded {len(todos)} todos")
                 todos.append(new_todos)
                 functions.write_todos(todos)
                 window['todos'].update(values=todos)
             except IndexError:
-                    sg.popup("Entry box cannot be blank.")
-                    continue
+                sg.popup("Entry box cannot be blank.")
+                continue
+
         case "Edit":
+            print("Executing Edit")
             try:
                 todo_to_edit = values['todos'][0]
                 todo_to_edit.strip()
@@ -49,10 +58,11 @@ while True:
                 functions.write_todos(todos)
                 window['todos'].update(values=todos)
             except IndexError:
-                    sg.popup("Entry box cannot be blank.")
-                    continue
+                sg.popup("Entry box cannot be blank.")
+                continue
 
         case "Complete":
+            print("Executing Complete")
             try:
                 todo_to_complete = values['todos'][0]
                 todos = functions.get_todos()
@@ -61,15 +71,18 @@ while True:
                 window['todos'].update(values=todos)
                 window['todo'].update(value='')
             except IndexError:
-                    sg.popup("Entry box cannot be blank.")
-                    continue
-
+                sg.popup("Entry box cannot be blank.")
+                continue
 
         case "todos":
+            print("Executing Todos")
             window['todo'].update(value=values['todos'][0])
 
         case "Exit":
-            sg.WIN_CLOSED
+            print("Executing Exit")
             break
+
+        case other:
+            window["clock"].update(value=time.strftime("%b %d %Y %H:%M:%S"))
 
 window.close()
